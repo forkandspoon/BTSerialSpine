@@ -15,26 +15,42 @@ console.log('sensorArray.length: '+ sensorArray.length);
 var sensorDistance = Math.round(stage.getHeight() / (sensorArray.length+1));
 console.log('sensorDistance = ' + sensorDistance);
 
-var toRadians = function(degrees){
+function toRadians(degrees){
     return (degrees*Math.PI/180);
 };
 
 console.log('sin (90d): ' + Math.sin(toRadians(90)));
 
 
-var sensorLinePointArray = [[stage.getWidth()/2, (stage.getHeight() - sensorDistance)],[,],[,],[,],[,],[,],[,],[,],[,],[,]];
+//var sensorLinePointArray = [[stage.getWidth()/2, (stage.getHeight() - sensorDistance)],[,],[,],[,],[,],[,],[,],[,],[,],[,]];
+
+//for (var i = 0; i < sensorArray.length; i++){
+//   sensorLinePointArray[i+1][0] = Math.round(sensorLinePointArray[i][0] - sensorDistance*Math.sin(toRadians(sensorArray[i])));
+//   sensorLinePointArray[i+1][1] = Math.round(sensorLinePointArray[i][1] - sensorDistance*Math.cos(toRadians(sensorArray[i])));
+//}
+
+var sensorLinePointArray = [{x: stage.getWidth()/2, y: (stage.getHeight() - sensorDistance)}];
+
+console.log('senLPA ' + sensorLinePointArray[0]);
+console.log('senLPAx ' + sensorLinePointArray[0].x);
+console.log('senLPAy ' + sensorLinePointArray[0].y);
+
+
 
 for (var i = 0; i < sensorArray.length; i++){
-   sensorLinePointArray[i+1][0] = Math.round(sensorLinePointArray[i][0] - sensorDistance*Math.sin(toRadians(sensorArray[i])));
-   sensorLinePointArray[i+1][1] = Math.round(sensorLinePointArray[i][1] - sensorDistance*Math.cos(toRadians(sensorArray[i])));
+    sensorLinePointArray.push({
+        x: Math.round(sensorLinePointArray[i].x - sensorDistance*Math.sin(toRadians(sensorArray[i]))),
+        y: Math.round(sensorLinePointArray[i].y - sensorDistance*Math.cos(toRadians(sensorArray[i])))
+    });  
 }
 
-for (var i = 0; i < sensorLinePointArray.length; i++){
-    console.log('array[' + i +'][0] ' + sensorLinePointArray[i][0]);
-    console.log('array[' + i +'][1] ' + sensorLinePointArray[i][1]);
-    console.log(sensorDistance*Math.cos(toRadians(sensorArray[i])));
-    console.log(sensorDistance*Math.sin(toRadians(sensorArray[i])));
-}
+console.log('senLPA 1 ' + sensorLinePointArray[1].x);
+//for (var i = 0; i < sensorLinePointArray.length; i++){
+//    console.log('array[' + i +'][0] ' + sensorLinePointArray[i][0]);
+//   console.log('array[' + i +'][1] ' + sensorLinePointArray[i][1]);
+//    console.log(sensorDistance*Math.cos(toRadians(sensorArray[i])));
+//    console.log(sensorDistance*Math.sin(toRadians(sensorArray[i])));
+//}
 
 var sensorLayer = new Kinetic.Layer();
 
@@ -44,11 +60,31 @@ var redLine = new Kinetic.Spline({
         strokeWidth: 5,
         lineCap: 'round',
         tension: 0.3
-      });
+});
+
+var points = redLine.getPoints();
+console.log(points[0]);
+console.log(points[0].x);
+console.log(points[0].y);
+
 
 sensorLayer.add(redLine);
 
 stage.add(sensorLayer);
+
+
+var anim = new Kinetic.Animation(function(frame) {
+    var newPoints = [sensorLinePointArray[0]];
+    var points = redLine.getPoints();
+    for(var i = 1; i < points.length; i++) {
+        newPoints.push({
+            x: points[i].x + (2 * Math.random()),
+            y: points[i].y + (2 * Math.random())
+        });
+    }
+    redLine.setPoints(newPoints);
+}, sensorLayer);
+anim.start();
 </script>
 </head>
 <body>
